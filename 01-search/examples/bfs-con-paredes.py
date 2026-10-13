@@ -2,7 +2,7 @@ from collections import deque
 
 def bfs(filas, columnas, inicio, objetivo, paredes):
 
-    cola = deque();
+    cola = deque()
     cola.append((inicio, [inicio]))
 
     visitados = set()

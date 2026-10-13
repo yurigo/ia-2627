@@ -3,7 +3,7 @@
 def dfs(filas, columnas, inicio, objetivo, paredes):
 
     # cola = deque();
-    pila = [];
+    pila = []
     # cola.append((inicio, [inicio]))
     pila.append((inicio, [inicio]))
 
