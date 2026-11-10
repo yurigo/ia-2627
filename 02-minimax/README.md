@@ -20,6 +20,37 @@ V(s) = max(V(hijo))                        si juega MAX
 V(s) = min(V(hijo))                        si juega MIN
 ```
 
+El siguiente pseudocódigo muestra la búsqueda recursiva. `copiarYJugar` crea un
+nuevo estado, por lo que el tablero de la llamada actual permanece intacto.
+
+```text
+función minimax(estado, jugador, profundidad):
+    si X ha ganado en estado: devolver (10 - profundidad, ninguna)
+    si O ha ganado en estado: devolver (profundidad - 10, ninguna)
+    si no quedan jugadas legales: devolver (0, ninguna)
+
+    si jugador = X:
+        mejorValor = -infinito
+    si no:
+        mejorValor = +infinito
+    mejorJugada = ninguna
+
+    para cada jugada legal en estado:
+        siguienteEstado = copiarYJugar(estado, jugada)
+        siguienteJugador = O si jugador = X; si no, X
+        (valor, _) = minimax(siguienteEstado, siguienteJugador,
+                             profundidad + 1)
+
+        si jugador = X y valor > mejorValor:
+            mejorValor = valor
+            mejorJugada = jugada
+        si jugador = O y valor < mejorValor:
+            mejorValor = valor
+            mejorJugada = jugada
+
+    devolver (mejorValor, mejorJugada)
+```
+
 Así, una jugada de MAX se valora suponiendo que MIN responderá con la mejor
 contrajugada posible, y viceversa. La elección de MAX es la jugada legal cuyo
 hijo tiene el valor más alto. Este razonamiento es óptimo para los supuestos del
@@ -48,6 +79,42 @@ solo omite alternativas que no podrían ser elegidas frente a una respuesta
 mejor ya encontrada. Su eficacia depende del orden de exploración: en el mejor
 caso puede reducir el trabajo a `O(b^(d/2))`, mientras que en el peor caso sigue
 siendo `O(b^d)`. El espacio de búsqueda en profundidad continúa siendo `O(d)`.
+
+El pseudocódigo es igual a minimax salvo por las cotas, que se actualizan después
+de cada hijo, y el corte cuando ya no es posible mejorar la decisión:
+
+```text
+función minimaxAlfaBeta(estado, jugador, profundidad, alfa, beta):
+    si X ha ganado en estado: devolver (10 - profundidad, ninguna)
+    si O ha ganado en estado: devolver (profundidad - 10, ninguna)
+    si no quedan jugadas legales: devolver (0, ninguna)
+
+    mejorJugada = ninguna
+    si jugador = X:
+        mejorValor = -infinito
+        para cada jugada legal en estado:
+            siguienteEstado = copiarYJugar(estado, jugada)
+            (valor, _) = minimaxAlfaBeta(siguienteEstado, O,
+                                         profundidad + 1, alfa, beta)
+            si valor > mejorValor:
+                mejorValor = valor
+                mejorJugada = jugada
+            alfa = max(alfa, mejorValor)
+            si alfa >= beta: salir del bucle
+    si no:
+        mejorValor = +infinito
+        para cada jugada legal en estado:
+            siguienteEstado = copiarYJugar(estado, jugada)
+            (valor, _) = minimaxAlfaBeta(siguienteEstado, X,
+                                         profundidad + 1, alfa, beta)
+            si valor < mejorValor:
+                mejorValor = valor
+                mejorJugada = jugada
+            beta = min(beta, mejorValor)
+            si alfa >= beta: salir del bucle
+
+    devolver (mejorValor, mejorJugada)
+```
 
 [`examples/minimax_alpha_beta.py`](examples/minimax_alpha_beta.py) resuelve el
 mismo estado inicial de tres en raya con estas cotas.
